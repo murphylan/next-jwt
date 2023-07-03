@@ -3,6 +3,7 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import * as jose from "jose";
 import { setCookie } from "cookies-next";
+import axios from "axios";
 
 export default async function handler(
   req: NextApiRequest,
@@ -35,6 +36,28 @@ export default async function handler(
       return res.status(400).json({ errorMessage: errors[0] });
     }
 
+
+    try {
+      const response = await axios.post('http://localhost:8080/token', null, {
+        auth: {
+          username: 'user1@abc.com',
+          password: 'password'
+        }
+      });
+
+      // 处理响应
+      const token = response.data;
+      console.log(token);
+      setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
+    } catch (error) {
+      // 处理错误
+      console.error(error);
+      return res
+        .status(401)
+        .json({ errorMessage: "Email or password is invalid" });
+    }
+
+
     const user = {
       id: "id",
       firstName: "firstName",
@@ -44,32 +67,6 @@ export default async function handler(
       password: password,
       phone: "phone"
     }
-
-    if (!user) {
-      return res
-        .status(401)
-        .json({ errorMessage: "Email or password is invalid" });
-    }
-
-    // const isMatch = await bcrypt.compare(password, user.password);
-    const isMatch = (password === user.password);
-
-    if (!isMatch) {
-      return res
-        .status(401)
-        .json({ errorMessage: "Email or password is invalid" });
-    }
-
-    const alg = "HS256";
-
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-
-    const token = await new jose.SignJWT({ email: user.email })
-      .setProtectedHeader({ alg })
-      .setExpirationTime("24h")
-      .sign(secret);
-
-    setCookie("jwt", token, { req, res, maxAge: 60 * 6 * 24 });
 
     return res.status(200).json({
       firstName: user.firstName,

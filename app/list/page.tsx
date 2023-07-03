@@ -17,7 +17,7 @@ const ListPage: React.FC = () => {
 
         : (
           data ?
-            <div className="font-mono text-7xl text-violet-600">{data.email}</div>
+            <div className="font-mono text-7xl text-violet-600">{data.email ?? data}</div>
             : (
               <div className="font-mono text-7xl text-red-500">未登陆</div>
             )

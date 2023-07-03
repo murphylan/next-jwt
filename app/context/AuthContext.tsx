@@ -27,7 +27,7 @@ export const AuthenticationContext = createContext<AuthState>({
   loading: false,
   error: null,
   data: null,
-  setAuthState: () => {},
+  setAuthState: () => { },
 });
 
 export default function AuthContext({
@@ -58,14 +58,14 @@ export default function AuthContext({
         });
       }
 
-      const response = await axios.get("/api/auth/me", {
+      const response = await axios.get('http://localhost:8080/hello', {
         headers: {
           Authorization: `Bearer ${jwt}`,
         },
       });
 
-      axios.defaults.headers.common["Authorization"] = `Bearer ${jwt}`;
-
+      // axios.defaults.headers.common["Authorization"] = `Bearer ${jwt}`;
+      
       setAuthState({
         data: response.data,
         error: null,
@@ -74,7 +74,7 @@ export default function AuthContext({
     } catch (error: any) {
       setAuthState({
         data: null,
-        error: error.response.data.errorMessage,
+        error: error.message,
         loading: false,
       });
     }
